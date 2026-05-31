@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - City Loan 24</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        body { background-color: #f8fafc; }
+        
+        /* টপ লোগো ও হেডার সেকশন */
+        .top-brand-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: white; border-bottom: 1px solid #eee; }
+        .logo-area { display: flex; align-items: center; gap: 8px; }
+        .logo-icon { font-size: 28px; color: #d32f2f; font-weight: bold; }
+        .logo-text { font-size: 20px; font-weight: bold; color: #d32f2f; line-height: 1.1; }
+        .top-buttons { display: flex; gap: 8px; }
+        .top-btn { padding: 6px 12px; border: 1px solid #ccc; background: white; border-radius: 6px; font-size: 13px; font-weight: bold; color: #333; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+        .logout-btn { color: #d32f2f; border-color: #ffcdd2; }
+
+        /* স্বাগতম ও ব্যালেন্স বার */
+        .header-container { background: #d32f2f; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: bold; }
+        .balance-box { background: rgba(255, 255, 255, 0.2); padding: 6px 15px; border-radius: 20px; font-size: 14px; display: flex; align-items: center; gap: 5px; }
+        
+        /* সাব-হেডিং নোটিশ */
+        .sub-title { background: #e0e0e0; color: #333; text-align: center; padding: 10px; font-size: 14px; font-weight: bold; border-bottom: 1px solid #ccc; }
+        
+        /* ফিচার গ্রিড লেআউট */
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        
+        /* প্রতিটি আলাদা ফিচারের কার্ড ডিজাইন */
+        .menu-card { background: white; border-radius: 12px; padding: 25px 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; border: 1px solid #eaeaea; transition: transform 0.2s; }
+        .menu-card:active { transform: scale(0.95); background: #fafafa; }
+        
+        /* আইকন সার্কেল */
+        .icon-circle { width: 45px; height: 45px; border: 2px solid #d32f2f; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; color: #d32f2f; font-size: 20px; font-weight: bold; }
+        .menu-card p { font-size: 15px; color: #333; font-weight: bold; }
+
+        /* পপআপ এরিয়া ওভারলে */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; overflow-y: auto; }
+        .popup { display: none; width: 100%; min-height: 100vh; background: white; position: relative; padding: 20px; }
+        .close-popup-x { font-size: 35px; color: #d32f2f; cursor: pointer; font-weight: bold; float: right; }
+
+        /* ব্র্যান্ড ও নোটিশ স্টাইল */
+        .popup-brand { background: white; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; margin-bottom: 15px; }
+        .popup-notice { background: #e0e0e0; color: #333; text-align: center; padding: 12px; font-size: 15px; font-weight: bold; border-bottom: 1px solid #ccc; margin-bottom: 25px; }
+
+        /* বোতাম ও সাধারণ ফর্ম স্টাইল */
+        .next-btn { width: 100%; padding: 16px; background: #d32f2f; color: white; border: none; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3); text-align: center; }
+        .form-group { margin-bottom: 25px; text-align: left; }
+        .form-group label { display: block; font-size: 18px; font-weight: bold; color: #111; margin-bottom: 10px; }
+        .form-group input, .form-group select { width: 100%; padding: 16px; border: 2px solid #aaa; border-radius: 10px; font-size: 16px; background: #fafafa; outline: none; font-weight: bold; color: #000; }
+        
+        /* টেবিল ডিজাইন */
+        .calc-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 16px; font-weight: bold; }
+        .calc-table tr { border-bottom: 1px solid #eee; }
+        .calc-table td { padding: 14px 8px; color: #333; }
+        .calc-table td:last-child { text-align: right; color: #000; }
+        .calc-heading { color: #d32f2f; font-size: 20px; font-weight: bold; border-bottom: 3px solid #d32f2f; padding-bottom: 8px; margin-bottom: 20px; }
+
+        /* আপলোড সেকশন স্টাইল */
+        .upload-box { border: 2px dashed #aaa; padding: 30px; border-radius: 12px; text-align: center; background: #fafafa; cursor: pointer; margin-bottom: 20px; position: relative; }
+        .upload-box input[type="file"] { position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer; }
+        .upload-icon { font-size: 40px; color: #888; display: block; margin-bottom: 8px; }
+        .upload-text { font-size: 14px; color: #444; font-weight: bold; }
+        .upload-success-msg { color: #157347; font-weight: bold; margin-top: 5px; display: none; }
+
+        /* কাস্টম স্টাইল */
+        .deposit-number-box { background: #f1f5f9; border: 2px dashed #d32f2f; padding: 15px; border-radius: 10px; font-size: 20px; font-weight: bold; color: #d32f2f; text-align: center; margin-bottom: 20px; letter-spacing: 1px; }
+        .refer-bonus-tag { font-size: 24px; font-weight: bold; color: #d32f2f; text-align: center; margin-bottom: 20px; background: #fff0f0; padding: 15px; border-radius: 10px; border: 1px solid #ffcccc; }
+        .circle-border { width: 140px; height: 140px; border: 5px solid #d32f2f; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; background: white; cursor: pointer; box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .profile-icon-blue { font-size: 70px; color: #1a73e8; }
+        .info-box { background: #f1f3f4; padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #ddd; text-align: center; }
+        .info-box span { display: block; font-size: 14px; color: #555; font-weight: bold; margin-bottom: 3px; }
+        .info-box p { font-size: 18px; color: #111; font-weight: bold; }
+        
+        .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px 10px; border-radius: 10px; text-align: center; }
+        .stat-card.full-width { grid-column: span 2; background: #fff0f0; border-color: #ffcccc; }
+        .stat-card span { display: block; font-size: 13px; color: #64748b; font-weight: bold; margin-bottom: 5px; }
+        .stat-card p { font-size: 18px; font-weight: bold; color: #1e293b; }
+        .stat-card.full-width p { color: #d32f2f; font-size: 22px; }
+        
+        .history-title { font-size: 16px; font-weight: bold; color: #333; margin: 15px 0 10px 0; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        .history-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .history-table th, .history-table td { padding: 10px; font-size: 14px; border-bottom: 1px solid #e2e8f0; }
+        .history-table th { background: #f1f5f9; color: #475569; font-weight: bold; }
+        .txt-success { color: #16a34a; font-weight: bold; }
+        .txt-danger { color: #dc2626; font-weight: bold; }
+
+        .loan-status-box { background: #fdfdfd; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .loan-offer-badge { background: #fef3c7; color: #d97706; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; display: inline-block; margin-bottom: 15px; border: 1px solid #fde68a; }
+        .loan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .loan-item { background: #f8fafc; border: 1px solid #f1f5f9; padding: 12px; border-radius: 8px; }
+        .loan-item span { display: block; font-size: 12px; color: #64748b; font-weight: bold; margin-bottom: 4px; }
+        .loan-item p { font-size: 16px; font-weight: bold; color: #0f172a; }
+        .loan-item.highlight { background: #fff5f5; border-color: #fee2e2; }
+        .loan-item.highlight p { color: #ef4444; }
+
+        .shadow-profile-box { background: white; border-radius: 15px; padding: 15px; margin-bottom: 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.06); border: 1px solid #eef2f5; text-align: center; }
+        .referred-users-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
+        .mini-shadow-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; text-align: center; }
+        .mini-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #d32f2f; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px auto; color: #d32f2f; font-weight: bold; font-size: 18px; }
+        .gov-certificate-container { border: 4px double #157347; padding: 20px; border-radius: 10px; background: #f4fbf7; margin-top: 25px; text-align: center; }
+        .gov-seal { width: 60px; height: 60px; background: #157347; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto; font-size: 32px; font-weight: bold; }
+        .gov-title { font-size: 18px; font-weight: bold; color: #157347; margin-bottom: 5px; }
+        .gov-subtitle { font-size: 12px; color: #444; font-weight: bold; margin-bottom: 15px; border-bottom: 1px dashed #157347; padding-bottom: 8px; }
+        .cert-body { text-align: justify; font-size: 13px; color: #222; line-height: 1.6; font-weight: 500; }
+        .cert-footer-sign { text-align: right; font-size: 12px; color: #333; font-weight: bold; margin-top: 20px; font-style: italic; border-top: 1px solid #ccc; padding-top: 4px; display: inline-block; float: right; }
+    </style>
+</head>
+<body>
+
+    <div class="top-brand-bar">
+        <div class="logo-area">
+            <span class="logo-icon">🔸</span>
+            <div class="logo-text">City<br>Loan</div>
+        </div>
+        <div class="top-buttons">
+            <button class="top-btn" id="top-profile-btn">👤 প্রোফাইল</button>
+            <button class="top-btn logout-btn" id="top-logout">↪️ লগআউট</button>
+        </div>
+    </div>
+
+    <div class="header-container">
+        <span id="welcomeText">স্বাগতম, লোড হচ্ছে...</span>
+        <div class="balance-box">💼 ৳ <span id="userBalance">0.00</span></div>
+    </div>
+
+    <div class="sub-title">আপনার আর্থিক সহায়তায় পাশে আছে সর্বদা</div>
+
+    <div class="grid-container">
+        <div class="menu-card" id="btn-loan">
+            <div class="icon-circle">➕</div>
+            <p>লোন আবেদন</p>
+        </div>
+        <div class="menu-card" id="btn-withdraw">
+            <div class="icon-circle">➖</div>
+            <p>ক্যাশ আউট</p>
+        </div>
+        <div class="menu-card" id="btn-deposit">
+            <div class="icon-circle">💼</div>
+            <p>জমা দিন</p>
+        </div>
+        <div class="menu-card" id="btn-profile">
+            <div class="icon-circle">👤</div>
+            <p>প্রোফাইল</p>
+        </div>
+        <div class="menu-card" id="btn-myloan">
+            <div class="icon-circle">🏦</div>
+            <p>আমার লোন</p>
+        </div>
+        <div class="menu-card" id="btn-history">
+            <div class="icon-circle">📝</div>
+            <p>লেনদেনসমূহ</p>
+        </div>
+        <div class="menu-card" id="btn-refer">
+            <div class="icon-circle">📢</div>
+            <p>রেফার করুন</p>
+        </div>
+        <div class="menu-card" id="btn-about">
+            <div class="icon-circle">ℹ️</div>
+            <p>সম্পর্কে</p>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay">
+        
+        <div class="popup" id="loanPopup">
+            <div class="popup-brand">
+                <div style="display: flex; align-items: center; gap: 8px;"><span class="logo-icon">🔸</span><div class="logo-text">City<br>Loan</div></div>
+                <span class="close-popup-x" onclick="closePopup()">×</span>
+            </div>
+            <div class="popup-notice" id="loanPopupNotice">আপনার আর্থিক সহায়তায় পাশে আছে সর্বদা</div>
+            
+            <div class="popup-body">
+                
+                <div id="loan-step-1">
+                    <div class="form-group">
+                        <label>ব্যবহারকারীর নাম</label>
+                        <input type="text" id="loanUserNameInput" placeholder="আপনার নাম লিখুন">
+                    </div>
+                    <div class="form-group">
+                        <label>লোনের পরিমাণ</label>
+                        <select id="loanAmountSelect">
+                            <option value="">একটি নির্বাচন করুন</option>
+                            <option value="5000">৫,০০০ টাকা</option>
+                            <option value="10000">১০,০০০ টাকা</option>
+                            <option value="20000">২০,০০০ টাকা</option>
+                            <option value="30000">৩০,০০০ টাকা</option>
+                            <option value="50000">৫০,০০০ টাকা</option>
+                            <option value="80000">৮০,০০০ টাকা</option>
+                            <option value="100000">১,০০,০০০ টাকা</option>
+                            <option value="150000">১,৫০,০০০ টাকা</option>
+                            <option value="200000">২,০০,০০০ টাকা</option>
+                            <option value="250000">২,৫০,০০০ টাকা</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>মেয়াদ</label>
+                        <select id="loanDurationSelect">
+                            <option value="">একটি নির্বাচন করুন</option>
+                            <option value="3">৩ মাস</option>
+                            <option value="6">৬ মাস</option>
+                            <option value="9">৯ মাস</option>
+                            <option value="12">১২ মাস</option>
+                            <option value="15">১৫ মাস</option>
+                            <option value="18">১৮ মাস</option>
+                            <option value="21">২১ মাস</option>
+                            <option value="24">২৪ মাস</option>
+                            <option value="27">২৭ মাস</option>
+                            <option value="30">৩০ মাস</option>
+                            <option value="33">৩৩ মাস</option>
+                            <option value="36">৩৬ মাস</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>লোনের কারণ</label>
+                        <select id="loanReasonSelect">
+                            <option value="">একটি নির্বাচন করুন</option>
+                            <option value="ব্যবসা">ব্যবসা</option>
+                            <option value="পড়াশোনা">পড়াশোনা</option>
+                            <option value="বাড়ি">বাড়ি</option>
+                            <option value="অন্যান্য">অন্যান্য</option>
+                        </select>
+                    </div>
+                    <button class="next-btn" id="loanNextBtn1">আবেদন করুন ➔</button>
+                </div>
+
+                <div id="loan-step-2" style="display: none;">
+                    <div class="calc-heading">অ্যামাউন্ট বিস্তারিত</div>
+                    <table class="calc-table">
+                        <tr><td>লোনের পরিমাণ:</td><td>৳ <span id="calcLoanAmt">0.00</span></td></tr>
+                        <tr><td>ইন্টারেস্ট রেট:</td><td>3.00%</td></tr>
+                        <tr><td>মোট ইন্টারেস্ট:</td><td>৳ <span id="calcInterestAmt">0.00</span></td></tr>
+                        <tr><td>মোট পরিশোধযোগ্য:</td><td>৳ <span id="calcTotalPayable">0.00</span></td></tr>
+                        <tr style="background: #fff0f0; color: #d32f2f;"><td>১০% জামানত ফান্ড:</td><td style="color: #d32f2f;">৳ <span id="calcSecurityAmt">0.00</span></td></tr>
+                    </table>
+                    <button class="next-btn" id="loanNextBtn2">এগিয়ে যান ➔</button>
+                </div>
+
+                <div id="loan-step-3" style="display: none;">
+                    <div class="calc-heading" style="font-size: 16px; background:#e8f5e9; color:#157347; padding:10px; border-radius:5px; border-bottom:none; text-align:center;">আবেদন তথ্য সংরক্ষিত হয়েছে, এখন ডকুমেন্ট আপলোড করুন।</div>
+                    
+                    <div class="form-group" style="margin-top:15px;">
+                        <label>ডকুমেন্ট টাইপ</label>
+                        <select id="docTypeSelect"><option value="NID">NID</option></select>
+                    </div>
+
+                    <p style="font-weight: bold; margin-bottom: 5px;">Front Side</p>
+                    <div class="upload-box">
+                        <span class="upload-icon">📁</span>
+                        <span class="upload-text">Click to upload or drag and drop<br><small>PNG, JPG, JPEG, PDF up to 5MB</small></span>
+                        <input type="file" id="nidFrontInput" accept="image/jpeg, image/png, image/jpg">
+                        <p class="upload-success-msg" id="msgFront">NID সামনের পার্ট সিলেক্ট হয়েছে! ✅</p>
+                    </div>
+
+                    <p style="font-weight: bold; margin-bottom: 5px;">Back Side</p>
+                    <div class="upload-box">
+                        <span class="upload-icon">📁</span>
+                        <span class="upload-text">Click to upload or drag and drop<br><small>PNG, JPG, JPEG, PDF up to 5MB</small></span>
+                        <input type="file" id="nidBackInput" accept="image/jpeg, image/png, image/jpg">
+                        <p class="upload-success-msg" id="msgBack">NID পিছনের পার্ট সিলেক্ট হয়েছে! ✅</p>
+                    </div>
+                    
+                    <button class="next-btn" id="loanNextBtn3">পরবর্তী этап ➔</button>
+                </div>
+
+                <div id="loan-step-4" style="display: none;">
+                    <div class="calc-heading">জামানত ভেরিফিকেশন (১০%)</div>
+                    
+                    <div class="deposit-number-box">
+                        <span style="font-size:15px; color:#555; display:block;">এই নাম্বার এ সেন্ডমানি করুন:</span>
+                        <p id="loanRotatedNumber" style="font-size: 25px; margin-top:5px;">01XXXXXXXXX</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>জামানত টাকার পরিমাণ (৳)</label>
+                        <input type="number" id="loanSecurityAmountInput" placeholder="আপনার জামানত টাকার পরিমাণ লিখুন">
+                    </div>
+
+                    <div class="form-group">
+                        <label>ট্রানজেকশন আইডি (Transaction ID)</label>
+                        <input type="text" id="loanTxidInput" placeholder="TrxID প্রদান করুন">
+                    </div>
+
+                    <button class="next-btn" id="loanSubmitBtn" style="background: #16a34a;">ঠিক আছে (আবেদন জমা দিন)</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="popup" id="depositPopup">
+            <div class="popup-brand">
+                <div style="display: flex; align-items: center; gap: 8px;"><span class="logo-icon">🔸</span><div class="logo-text">City<br>Loan</div></div>
+                <span class="close-popup-x" onclick="closePopup()">×</span>
+            </div>
+            <div class="popup-notice">আপনার আর্থিক সহায়তায় পাশে আছে সর্বদা</div>
+            <div class="popup-body">
+                <h2 style="text-align: center; margin-bottom: 15px; font-weight: bold; color: #333;">টাকা জমা দিন (কিস্তি পরিশোধ)</h2>
+                <div class="deposit-number-box"><span>এই নাম্বার এ টাকা জমা দিন:</span><p id="rotatedDepositNumber" style="margin-top: 5px; font-size: 24px;">01XXXXXXXXX</p></div>
+                <div id="deposit-step-1">
+                    <div class="form-group"><label>টাকার পরিমাণ লিখুন (৳)</label><input type="number" id="depositAmountInput" placeholder="যেমন: ১০০০"></div>
+                    <button class="next-btn" id="depositNextBtn">পরবর্তী ➔</button>
+                </div>
+                <div id="deposit-step-2" style="display: none;">
+                    <div class="form-group"><label>ট্রানজেকশন আইডি (Transaction ID)</label><input type="text" id="depositTxidInput" placeholder="TrxID লিখুন"></div>
+                    <button class="next-btn" id="depositSubmitBtn" style="background: #16a34a;">ঠিক আছে (সাবমিট করুন)</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="popup" id="withdrawPopup">
+            <div class="popup-brand">
+                <div style="display: flex; align-items: center; gap: 8px;"><span class="logo-icon">🔸</span><div class="logo-text">City<br>Loan</div></div>
+                <span class="close-popup-x" onclick="closePopup()">×</span>
+            </div>
+            <div class="popup-notice">আপনার আর্থিক সহায়তায় পাশে আছে সর্বদা</div>
+            <div class="popup-body">
+                <h2 style="text-align: center; margin-bottom: 25px; font-weight: bold; color: #333;">ক্যাশ আউট করুন</h2>
+                <div id="withdraw-step-1">
+                    <div class="form-group"><label>উত্তোলনের পরিমাণ লিখুন (৳)</label><input type="number" id="withdrawAmountInput" placeholder="উইথড্র পরিমাণ লিখুন"></div>
+                    <button class="next-btn" id="withdrawNextBtn">পরবর্তী ➔</button>
+                </div>
+                <div id="withdraw-step-2" style="display: none;">
+                    <div class="form-group"><label>আপনার নাম</label><input type="text" id="withdrawNameInput" placeholder="আপনার পুরো নাম লিখুন"></div>
+                    <div class="form-group"><label>মোবাইল নম্বর (টাকা পাওয়ার নম্বর)</label><input type="number" id="withdrawPhoneInput" placeholder="01XXXXXXXXX"></div>
+                    <button class="next-btn" id="withdrawSubmitBtn" style="background: #16a34a;">ঠিক আছে (সাবমিট করুন)</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="popup" id="myloanPopup">
+            <div class="popup-brand">
+                <div style="display: flex; align-items: center; gap: 8px;"><span class="logo-icon">🔸</span><div class="logo-text">City<br>Loan</div></div>
+                <span class="close-popup-x" onclick="closePopup()">×</span>
+            </div>
+            <div class="popup-notice">আপনার আর্থিক সহায়তায় পাশে আছে সর্বদা</div>
+            <div class="popup-body">
+                <h2 style="text-align: center; margin-bottom: 20px; font-weight: bold; color: #333;">আমার লোন হিসাব</h2>
+                <div class="loan-status-box">
+                    <div style="text-align: center;"><span class="loan-offer-badge" id="loan-offer-name">চলতি অফার: কোনো সক্রিয় লোন নেই</span></div>
+                    <div class="loan-grid">
+                        <div class="loan-item"><span>💰 কত টাকা লোন নিলাম</span><p id="loan-total-amount">৳ 0.00</p></div>
+                        <div class="loan-item"><span>✅ কত টাকা দিলাম (পরিশোধ)</span><p id="loan-paid-amount">৳ 0.00</p></div>
+                        <div class="loan-item highlight"><span>🚨 কত টাকা বাকি আছে</span><p id="loan-due-amount">৳ 0.00</p></div>
+                        <div class="loan-item"><span>📅 কত কিস্তি বাকি</span><p id="loan-due-installments">0 টি</p></div>
+                    </div>
+                </div>
+                <button class="next-btn" onclick="closePopup()">বন্ধ করুন</button>
+            </div>
+        </div>
+
+        <div class="popup" id="aboutPopup">
+            <div class="popup-brand">
+                <div style="display: flex; align-items: center; gap: 8px;"><span class="logo-icon">🔸</span><div class="logo-text">City<br>Loan</div></div>
+                <span class="close-popup-x" onclick="closePopup()">×</span>
+            </div>
+            <div class="popup-notice">আপনার আর্থিক সহায়তায় পাশে আছে সর্বদা</div>
+            <div class="popup-body" style="padding-bottom: 30px;">
+                <div class="about-heading-tag">─── আপনি ───</div>
+                <div class="shadow-profile-box">
+                    <div class="mini-avatar" style="width:55px; height:55px; font-size:24px;">👤</div>
+                    <h3 id="about-my-name" style="color:#111; font-size:18px;">ইউজার</h3>
+                    <p id="about-my-phone" style="color:#666; font-size:14px; margin-top:2px;">01XXXXXXXXX</p>
+                </div>
+                <div class="about-heading-tag">─── আপনার রেফারেল টিম ───</div>
+                <div class="referred-users-grid" id="aboutReferTeamList"><div class="mini-shadow-card" style="grid-column: span 2; color:#888; font-size:13px;">কোনো রেফারেল রেকর্ড পাওয়া যায়নি</div></div>
+                <div class="about-heading-tag">─── আপনাকে যিনি রেফার করেছেন ───</div>
+                <div class="shadow-profile-box" style="background: #fdfdfd;"><div class="mini-avatar" style="border-color:#475569; color:#475569;">👤</div><h3 id="about-upliner-phone" style="color:#333; font-size:16px;">সরাসরি এডমিন লিংক</h3></div>
+                <div class="gov-certificate-container">
+                    <div class="gov-seal">🇧🇩</div><div class="gov-title">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div><div class="gov-subtitle">বাণিজ্য মন্ত্রণালয় ওডিজিটাল ক্ষুদ্রঋণ অনুমোদন বোর্ড</div>
+                    <div class="cert-body">এতদ্বারা প্রত্যয়ন করাပါသည်။ <b>সিটি লোন ২৪ (City Loan 24)</b> আর্থিক institution আইন অনুযায়ী বাংলাদেশ সরকারের ডিজিটাল ক্ষুদ্রঋণ ও কাস্টমার রেফারিং নীতিমালা অনুমোদন প্রাপ্ত একটি বিশ্বস্ত প্ল্যাটফর্ম।</div>
+                    <div style="width:100%; display:block; height:30px;"><span class="cert-footer-sign">অনুমোদিত মহানিবন্ধক স্বাক্ষর</span></div>
+                </div>
+                <button class="next-btn" style="margin-top: 30px;" onclick="closePopup()">বন্ধ করুন</button>
+            </div>
+        </div>
+
+        <div class="popup" id="historyPopup">
+            <div class="popup-brand">
+                <div style="display: flex; align-items: center; gap: 8px;"><span class="logo-icon">🔸</span><div class="logo-text">City<br>Loan</div></div>
+                <span class="close-popup-x" onclick="closePopup()">×</span>
+            </div>
+            <div class="popup-notice">আপনার আর্থিক সহায়তায় পাশে আছে সর্বদা</div>
+            <div class="popup-body">
+                <h2 style="text-align: center; margin-bottom: 20px; font-weight: bold; color: #333;">লেনদেনসমূহ</h2>
+                <div class="stats-container">
+                    <div class="stat-card"><span>💰 মোট উপার্জন</span><p id="total-earned">৳ 0.00</p></div>
+                    <div class="stat-card"><span>💸 মোট উত্তোলন</span><p id="total-withdrawn">৳ 0.00</p></div>
+                    <div class="stat-card full-width"><span>💼 বর্তমান একاونট ব্যালেন্স</span><p id="total-current-balance">৳ 0.00</p></div>
+                </div>
+                <div class="history-title">📜 বিস্তারিত লেনদেন রেকর্ড</div>
+                <div style="overflow-x: auto;"><table class="history-table"><thead><tr><th>বিবরণ</th><th>পরিমাণ</th><th>ধরণ</th></tr></thead><tbody id="historyTableBody"></tbody></table></div>
+                <button class="next-btn" style="margin-top: 25px;" onclick="closePopup()">বন্ধ করুন</button>
+            </div>
+        </div>
+
+        <div class="popup" id="profilePopup">
+            <div class="popup-brand">
+                <div style="display: flex; align-items: center; gap: 8px;"><span class="logo-icon">🔸</span><div class="logo-text">City<br>Loan</div></div>
+                <span class="close-popup-x" onclick="closePopup()">×</span>
+            </div>
+            <div class="popup-notice">আপনার আর্থিক সহায়তায় পাশে আছে সর্বদা</div>
+            <div class="popup-body">
+                <div class="profile-img-container"><div class="circle-border" id="secretAdminTap"><span class="profile-icon-blue">👤</span></div></div>
+                <div class="profile-details"><h2>প্রোফাইল</h2><div class="info-box"><span>আপনার নাম</span><p id="prof-name">로드 중...</p></div><div class="info-box"><span>মোবাইল নাম্বার</span><p id="prof-phone">01XXXXXXXXX</p></div></div>
+                <button class="next-btn" style="margin-top: 15px;" onclick="closePopup()">বন্ধ করুন</button>
+            </div>
+        </div>
+
+        <div class="popup" id="referPopup">
+            <div class="popup-brand">
+                <div style="display: flex; align-items: center; gap: 8px;"><span class="logo-icon">🔸</span><div class="logo-text">City<br>Loan</div></div>
+                <span class="close-popup-x" onclick="closePopup()">×</span>
+            </div>
+            <div class="popup-notice">আপনার আর্থিক সহায়তায় পাশে আছে সর্বদা</div>
+            <div style="margin-top: 10px;">
+                <div class="refer-bonus-tag">প্রতি রেফার এ ১০ টাকা করে পাবেন। 🎁</div>
+                <div class="form-group"><label>আপনার ইউনিক রেফারেল লিংক</label><input type="text" id="referLinkInput" readonly></div>
+                <button class="next-btn" id="copyReferBtn">লিংক কপি করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, collection, query, where, addDoc, getDocs, updateDoc, getDoc, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWxpvsh9lAzeRNhqwoLZeRNhqwoLZ", 
+            authDomain: "city-loan-24.firebaseapp.com",
+            projectId: "city-loan-24",
+            appId: "1:89116730523:web:bd77d11900fbd77d11900f"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const num = localStorage.getItem("userNum");
+        if(!num) { window.location.href = "login.html"; }
+
+        let currentUserCurrentBalance = 0;
+        let globalUserName = "";
+
+        // নম্বর রোটেশন
+        const depositNumbers = ["01813203177", "01938792659"];
+        let lastSelectedIndex = localStorage.getItem("loanNumIndex");
+        let nextIndex = 0;
+        if (lastSelectedIndex !== null) {
+            nextIndex = (parseInt(lastSelectedIndex) + 1) % depositNumbers.length;
+        }
+        localStorage.setItem("loanNumIndex", nextIndex);
+        const selectedLoanNumber = depositNumbers[nextIndex];
+
+        // ইউজারের ডাটা এবং ব্যালেন্স রিয়েলটাইম লিসেনার
+        function listenToUserData() {
+            onSnapshot(doc(db, "users", num), (userSnap) => {
+                if(userSnap.exists()) {
+                    const userData = userSnap.data();
+                    globalUserName = userData.uName || "";
+                    currentUserCurrentBalance = Number(userData.balance || 0);
+                    
+                    document.getElementById('welcomeText').innerText = "স্বাগতম, " + (globalUserName || "ইউজার");
+                    document.getElementById('userBalance').innerText = currentUserCurrentBalance.toFixed(2);
+                    
+                    if(!document.getElementById('loanUserNameInput').value) {
+                        document.getElementById('loanUserNameInput').value = globalUserName;
+                    }
+                    
+                    document.getElementById('prof-name').innerText = globalUserName || "ইউজার";
+                    document.getElementById('prof-phone').innerText = num;
+                    document.getElementById('about-my-name').innerText = globalUserName || "ইউজার";
+                    document.getElementById('about-my-phone').innerText = num;
+                    document.getElementById('total-current-balance').innerText = "৳ " + currentUserCurrentBalance.toFixed(2);
+                    
+                    if(userData.referredBy) {
+                        document.getElementById('about-upliner-phone').innerText = "নম্বর: " + userData.referredBy;
+                    } else {
+                        document.getElementById('about-upliner-phone').innerText = "সরাসরি মূল এডমিন লিংক";
+                    }
+                    const domainPath = window.location.origin + window.location.pathname.replace("home.html", "index.html");
+                    document.getElementById('referLinkInput').value = domainPath + "?ref=" + num;
+                }
+            });
+
+            // লোন স্ট্যাটাস ট্র্যাকিং লজিক
+            onSnapshot(doc(db, "user_loans", num), (loanSnap) => {
+                if(loanSnap.exists()) {
+                    const loanData = loanSnap.data();
+                    const totalLoan = Number(loanData.totalLoanAmount || 0);
+                    const paidLoan = Number(loanData.paidAmount || 0);
+                    const dueLoan = totalLoan - paidLoan;
+                    document.getElementById('loan-offer-name').innerText = "চলতি অফার: " + (loanData.offerName || "সক্রিয় লোন");
+                    document.getElementById('loan-total-amount').innerText = "৳ " + totalLoan.toFixed(2);
+                    document.getElementById('loan-paid-amount').innerText = "৳ " + paidLoan.toFixed(2);
+                    document.getElementById('loan-due-amount').innerText = "৳ " + (dueLoan > 0 ? dueLoan.toFixed(2) : "0.00");
+                    document.getElementById('loan-due-installments').innerText = (loanData.remainingInstallments || 0) + " টি";
+                } else {
+                    document.getElementById('loan-offer-name').innerText = "চলতি অফার: কোনো সক্রিয় লোন নেই";
+                    document.getElementById('loan-total-amount').innerText = "৳ 0.00";
+                    document.getElementById('loan-paid-amount').innerText = "৳ 0.00";
+                    document.getElementById('loan-due-amount').innerText = "৳ 0.00";
+                    document.getElementById('loan-due-installments').innerText = "0 টি";
+                }
+            });
+
+            // লেনদেন হিস্টোরি
+            const q = query(collection(db, "transactions"), where("userNum", "==", num));
+            onSnapshot(q, (snapshot) => {
+                let totalEarned = 0; let totalWithdrawn = 0;
+                const tbody = document.getElementById('historyTableBody');
+                tbody.innerHTML = "";
+                snapshot.forEach((tDoc) => {
+                    const tData = tDoc.data(); const amount = Number(tData.amount || 0);
+                    const row = document.createElement('tr');
+                    if (tData.type === "earn" || tData.type === "topup" || tData.type === "refer" || tData.type === "loan_instant_success") {
+                        totalEarned += amount;
+                        row.innerHTML = `<td>${tData.title || 'বোনাস'}</td><td class="txt-success">+ ৳${amount.toFixed(2)}</td><td>ইনকাম</td>`;
+                    } else if (tData.type === "withdraw" && tData.status === "success") {
+                        totalWithdrawn += amount;
+                        row.innerHTML = `<td>${tData.title || 'উইথড্র'}</td><td class="txt-danger">- ৳${amount.toFixed(2)}</td><td>উত্তোলন</td>`;
+                    } else if (tData.type === "withdraw" && tData.status === "pending") {
+                        row.innerHTML = `<td>${tData.title || 'উইথড্র'} (পেন্ডিং)</td><td style="color:orange; font-weight:bold;">৳${amount.toFixed(2)}</td><td>পেন্ডিং</td>`;
+                    } else if (tData.type === "loan_request") {
+                        const sTxt = tData.status === "success" ? "সফল" : "পেন্ডিং";
+                        const sColor = tData.status === "success" ? "green" : "orange";
+                        row.innerHTML = `<td>${tData.title} (${sTxt})</td><td style="color:${sColor}; font-weight:bold;">৳${amount.toFixed(2)}</td><td>লোন আবেদন</td>`;
+                    }
+                    tbody.appendChild(row);
+                });
+                document.getElementById('total-earned').innerText = "৳ " + totalEarned.toFixed(2);
+                document.getElementById('total-withdrawn').innerText = "৳ " + totalWithdrawn.toFixed(2);
+            });
+        }
+        listenToUserData();
+
+        // ১০০% নিখুঁত অটো রেফারেল বোনাস লজিক (এডমিন প্যানেলের মেইন বাজেট ডক থেকে ১০ টাকা ইনস্ট্যান্ট কর্তন)
+        async function checkAndApplyInstantRegistrationReferBonus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refFromUrl = urlParams.get('ref');
+            
+            if (refFromUrl && refFromUrl.trim() !== "") {
+                const referrerPhone = refFromUrl.trim().replace(/[^0-9]/g, "");
+                
+                if (referrerPhone.length >= 10 && referrerPhone !== num) {
+                    const myUserDocRef = doc(db, "users", num);
+                    const myUserSnap = await getDoc(myUserDocRef);
+                    
+                    // নতুন ইউজার যদি প্রথমবার প্রবেশ করে (কোনো upliner লিংকেজ তৈরি না হয়ে থাকে)
+                    if (myUserSnap.exists() && !myUserSnap.data().referredBy) {
+                        
+                        // রেফারকারী (Upliner)-এর একাউন্ট ডাটা চেক করা
+                        const referrerDocRef = doc(db, "users", referrerPhone);
+                        const referrerSnap = await getDoc(referrerDocRef);
+                        
+                        if (referrerSnap.exists()) {
+                            // এডমিন প্যানেলের মেইন ডক থেকে সরাসরি লাইভ বাজেট রিড করা হচ্ছে
+                            const adminBudgetRef = doc(db, "admin_settings", "budget_info");
+                            const adminBudgetSnap = await getDoc(adminBudgetRef);
+                            
+                            let currentBudget = 0;
+                            if (adminBudgetSnap.exists()) {
+                                currentBudget = Number(adminBudgetSnap.data().amount || 0);
+                            }
+
+                            if (currentBudget >= 10) {
+                                const currentReferrerBal = Number(referrerSnap.data().balance || 0);
+                                
+                                // ১. রেফারকারীর মেইন ব্যালেন্সে ১০ টাকা যোগ হবে
+                                await updateDoc(referrerDocRef, { 
+                                    balance: currentReferrerBal + 10 
+                                });
+                                
+                                // ২. এডমিনের মূল বাজেট একাউন্ট থেকে ১০ টাকা মাইনাস হবে (১০০% সিঙ্ক)
+                                await updateDoc(adminBudgetRef, { 
+                                    amount: currentBudget - 10 
+                                });
+                                
+                                // ৩. নতুন ইউজারের প্রোফাইলে upliner হিসেবে রেফারকারীর নাম যুক্ত হবে
+                                await updateDoc(myUserDocRef, { 
+                                    referredBy: referrerPhone 
+                                });
+                                
+                                // ৪. রেফারকারীর ট্রানজেকশন রেকর্ডে ১০ টাকার সফল এন্ট্রি জেনারেট হবে
+                                await addDoc(collection(db, "transactions"), {
+                                    userNum: referrerPhone,
+                                    amount: 10,
+                                    type: "refer",
+                                    status: "success",
+                                    title: `রেফারেল বোনাস (ইউজার ${num} সফল রেজিস্ট্রেশন)`,
+                                    createdAt: new Date().toISOString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        checkAndApplyInstantRegistrationReferBonus();
+
+        // NID ইমেজ ভ্যালিডেশন
+        document.getElementById('nidFrontInput').onchange = function(e) {
+            if(this.files.length > 0) {
+                const f = this.files[0];
+                if(!f.type.startsWith('image/')) { alert(" can't upload! "); this.value=""; return; }
+                document.getElementById('msgFront').style.display = "block";
+            }
+        };
+        document.getElementById('nidBackInput').onchange = function(e) {
+            if(this.files.length > 0) {
+                const f = this.files[0];
+                if(!f.type.startsWith('image/')) { alert(" can't upload! "); this.value=""; return; }
+                document.getElementById('msgBack').style.display = "block";
+            }
+        };
+
+        const overlay = document.getElementById('overlay');
+        const loanPopup = document.getElementById('loanPopup');
+        const depositPopup = document.getElementById('depositPopup');
+        const withdrawPopup = document.getElementById('withdrawPopup');
+        const myloanPopup = document.getElementById('myloanPopup');
+        const aboutPopup = document.getElementById('aboutPopup');
+        const historyPopup = document.getElementById('historyPopup');
+        const profilePopup = document.getElementById('profilePopup');
+        const referPopup = document.getElementById('referPopup');
+
+        // লোন আবেদন বাটন ক্লিক
+        document.getElementById('btn-loan').onclick = () => {
+            overlay.style.display = "block"; hideAllPopups();
+            loanPopup.style.display = "block";
+            
+            document.getElementById('loan-step-1').style.display = "block";
+            document.getElementById('loan-step-2').style.display = "none";
+            document.getElementById('loan-step-3').style.display = "none";
+            document.getElementById('loan-step-4').style.display = "none";
+            
+            document.getElementById('loanAmountSelect').value = "";
+            document.getElementById('loanDurationSelect').value = "";
+            document.getElementById('loanReasonSelect').value = "";
+            document.getElementById('loanSecurityAmountInput').value = "";
+            document.getElementById('loanTxidInput').value = "";
+            document.getElementById('msgFront').style.display = "none";
+            document.getElementById('msgBack').style.display = "none";
+            document.getElementById('nidFrontInput').value = "";
+            document.getElementById('nidBackInput').value = "";
+        };
+
+        // লোন этап ১ থেকে этап ২
+        document.getElementById('loanNextBtn1').onclick = () => {
+            const typedName = document.getElementById('loanUserNameInput').value.trim();
+            const amt = Number(document.getElementById('loanAmountSelect').value);
+            const duration = document.getElementById('loanDurationSelect').value;
+            const reason = document.getElementById('loanReasonSelect').value;
+
+            if(!typedName || !amt || !duration || !reason) { alert("সব তথ্য সঠিকভাবে পূরণ করুন!"); return; }
+
+            const interest = amt * 0.03; const totalPayable = amt + interest; const securityDeposit = amt * 0.10;
+
+            document.getElementById('calcLoanAmt').innerText = amt.toFixed(2);
+            document.getElementById('calcInterestAmt').innerText = interest.toFixed(2);
+            document.getElementById('calcTotalPayable').innerText = totalPayable.toFixed(2);
+            document.getElementById('calcSecurityAmt').innerText = securityDeposit.toFixed(2);
+
+            document.getElementById('loan-step-1').style.display = "none";
+            document.getElementById('loan-step-2').style.display = "block";
+        };
+
+        // লোন этап ২ থেকে этап ৩
+        document.getElementById('loanNextBtn2').onclick = () => { document.getElementById('loan-step-2').style.display = "none"; document.getElementById('loan-step-3').style.display = "block"; };
+
+        // লোন этап ৩ থেকে этап ৪
+        document.getElementById('loanNextBtn3').onclick = () => {
+            const frontFile = document.getElementById('nidFrontInput').files.length;
+            const backFile = document.getElementById('nidBackInput').files.length;
+            if(frontFile === 0 || backFile === 0) { alert("NID কার্ডের ছবি আপলোড করুন!"); return; }
+            document.getElementById('loanRotatedNumber').innerText = selectedLoanNumber;
+            document.getElementById('loan-step-3').style.display = "none";
+            document.getElementById('loan-step-4').style.display = "block";
+        };
+
+        // লোন চূড়ান্ত সাবমিট 
+        document.getElementById('loanSubmitBtn').onclick = async () => {
+            const typedName = document.getElementById('loanUserNameInput').value.trim();
+            const amt = Number(document.getElementById('loanAmountSelect').value);
+            const userSecurityInput = Number(document.getElementById('loanSecurityAmountInput').value); 
+            const trxId = document.getElementById('loanTxidInput').value.trim();
+            
+            if(!userSecurityInput || userSecurityInput <= 0) { alert("জামানত এর পরিমাণ লিখুন!"); return; }
+
+            const expectedSecurity = amt * 0.10;
+            
+            if(userSecurityInput !== expectedSecurity) {
+                alert("ভুল জামানত! আপনার লোনের ১০% অনুযায়ী সঠিক জামানত হলো " + expectedSecurity + " টাকা। অনুগ্রহ করে সঠিক টাকা দিন।");
+                return;
+            }
+            if(!trxId) { alert("ট্রানজেকশন আইডি প্রদান করুন!"); return; }
+
+            const dupQuery = query(collection(db, "transactions"), where("trxId", "==", trxId));
+            const dupSnap = await getDocs(dupQuery);
+            if(!dupSnap.empty) { alert("এই ট্রানজেকশন আইডিটি ইতিমধ্যে ব্যবহার করা হয়েছে।"); return; }
+
+            // লোন সাবমিটের পর ট্রানজেকশন এরর হ্যান্ডেলিং সাকসেস লজিক
+            const userDocRef = doc(db, "users", num);
+            await runTransaction(db, async (transaction) => {
+                const userSnapshot = await transaction.get(userDocRef);
+                if (!userSnapshot.exists()) return;
+
+                const userData = userSnapshot.data();
+                const currentBalance = Number(userData.balance || 0);
+                const finalCalculatedBalance = currentBalance + amt + userSecurityInput;
+
+                transaction.update(userDocRef, { balance: finalCalculatedBalance });
+
+                const userTxRef = doc(collection(db, "transactions"));
+                transaction.set(userTxRef, {
+                    userNum: num, userName: typedName, amount: amt, securityAmountPaid: userSecurityInput, trxId: trxId, adminTargetNumber: selectedLoanNumber,
+                    type: "loan_instant_success", status: "success", title: "লোন ও জামানত যোগফল", createdAt: new Date().toISOString()
+                });
+            });
+
+            alert("আপনার লোন এর আবেদন সফল।"); closePopup();
+        };
+
+        // জমা দিন বাটন
+        document.getElementById('btn-deposit').onclick = () => {
+            overlay.style.display = "block"; hideAllPopups(); depositPopup.style.display = "block";
+            document.getElementById('rotatedDepositNumber').innerText = selectedLoanNumber;
+            document.getElementById('depositAmountInput').value = ""; document.getElementById('depositTxidInput').value = "";
+            document.getElementById('deposit-step-1').style.display = "block"; document.getElementById('deposit-step-2').style.display = "none";
+        };
+
+        document.getElementById('depositNextBtn').onclick = () => {
+            const amount = Number(document.getElementById('depositAmountInput').value);
+            if(!amount || amount <= 0) { alert("সঠিক জমার পরিমাণ লিখুন!"); return; }
+            document.getElementById('deposit-step-1').style.display = "none"; document.getElementById('deposit-step-2').style.display = "block";
+        };
+
+        document.getElementById('depositSubmitBtn').onclick = async () => {
+            const amount = Number(document.getElementById('depositAmountInput').value);
+            const trxId = document.getElementById('depositTxidInput').value.trim();
+            if(!trxId) { alert("ট্রানজেকশন আইডি লিখুন!"); return; }
+            try {
+                const dupQuery = query(collection(db, "transactions"), where("trxId", "==", trxId));
+                const dupSnap = await getDocs(dupQuery);
+                if(!dupSnap.empty) { alert("এই ট্রানজেকশন আইডিটি ইতিমধ্যে ব্যবহৃত হয়েছে!"); return; }
+
+                await addDoc(collection(db, "transactions"), {
+                    userNum: num, amount: amount, trxId: trxId, adminTargetNumber: selectedLoanNumber,
+                    type: "deposit", status: "pending", title: "লোন কিস্তি পরিশোধ", createdAt: new Date().toISOString()
+                });
+                alert("রিকোয়েস্ট সাবমিট হয়েছে!"); closePopup();
+            } catch (e) { alert(" failed! "); }
+        };
+
+        // ক্যাশ আউট বাটন
+        document.getElementById('btn-withdraw').onclick = () => {
+            overlay.style.display = "block"; hideAllPopups(); withdrawPopup.style.display = "block";
+            document.getElementById('withdrawAmountInput').value = "";
+            document.getElementById('withdrawNameInput').value = "";
+            document.getElementById('withdrawPhoneInput').value = "";
+            document.getElementById('withdraw-step-1').style.display = "block";
+            document.getElementById('withdraw-step-2').style.display = "none";
+        };
+
+        document.getElementById('withdrawNextBtn').onclick = () => {
+            const amount = Number(document.getElementById('withdrawAmountInput').value);
+            if(!amount || amount < 500) { alert("দুঃখিত, সর্বনিম্ন ৫০০ টাকা ক্যাশ আউট করতে পারবেন!"); return; }
+            if(amount > currentUserCurrentBalance) { alert("আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই!"); return; }
+            document.getElementById('withdraw-step-1').style.display = "none";
+            document.getElementById('withdraw-step-2').style.display = "block";
+        };
+
+        document.getElementById('withdrawSubmitBtn').onclick = async () => {
+            const amount = Number(document.getElementById('withdrawAmountInput').value);
+            const name = document.getElementById('withdrawNameInput').value.trim();
+            const phone = document.getElementById('withdrawPhoneInput').value.trim();
+            if(!name || !phone) { alert("সব তথ্য পূরণ করুন!"); return; }
+            
+            if(amount > currentUserCurrentBalance) { alert("দুঃখিত! পর্যাপ্ত ব্যালেন্স নেই।"); return; }
+
+            try {
+                const finalCalculatedBalance = currentUserCurrentBalance - amount;
+                const userDocRef = doc(db, "users", num);
+                await updateDoc(userDocRef, {
+                    balance: finalCalculatedBalance
+                });
+
+                await addDoc(collection(db, "transactions"), {
+                    userNum: num, userName: name, userTargetPhone: phone, amount: amount,
+                    type: "withdraw", status: "success", title: "ক্যাশ আউট সফল", createdAt: new Date().toISOString()
+                });
+
+                alert("আপনার ক্যাশ আউট এর আবেদন সফল।"); closePopup();
+            } catch (e) { alert(" failed! "); }
+        };
+
+        document.getElementById('btn-myloan').onclick = () => { overlay.style.display = "block"; hideAllPopups(); myloanPopup.style.display = "block"; };
+        document.getElementById('btn-about').onclick = () => { overlay.style.display = "block"; hideAllPopups(); aboutPopup.style.display = "block"; };
+        document.getElementById('btn-history').onclick = () => { overlay.style.display = "block"; hideAllPopups(); historyPopup.style.display = "block"; };
+        
+        function openProfile() { overlay.style.display = "block"; hideAllPopups(); profilePopup.style.display = "block"; }
+        document.getElementById('btn-profile').onclick = openProfile;
+        document.getElementById('top-profile-btn').onclick = openProfile;
+
+        document.getElementById('btn-refer').onclick = () => { overlay.style.display = "block"; hideAllPopups(); referPopup.style.display = "block"; };
+        document.getElementById('copyReferBtn').onclick = () => {
+            const referLinkInput = document.getElementById('referLinkInput'); referLinkInput.select();
+            navigator.clipboard.writeText(referLinkInput.value); alert("রেফারেল লিংক কপি হয়েছে!");
+        };
+
+        let tapCount = 0;
+        document.getElementById('secretAdminTap').onclick = () => {
+            tapCount++; if (tapCount === 15) { tapCount = 0; const p = prompt("এডমিন পাসওয়ার্ড:"); if (p === "admin123") { window.location.href = "admin.html"; } }
+        };
+
+        document.getElementById('top-logout').onclick = () => { localStorage.removeItem("userNum"); window.location.href = "login.html"; };
+
+        function hideAllPopups() {
+            loanPopup.style.display = "none"; depositPopup.style.display = "none"; withdrawPopup.style.display = "none";
+            myloanPopup.style.display = "none"; aboutPopup.style.display = "none"; historyPopup.style.display = "none";
+            profilePopup.style.display = "none"; referPopup.style.display = "none";
+        }
+
+        window.closePopup = function() { overlay.style.display = "none"; hideAllPopups(); }
+    </script>
+</body>
+</html>

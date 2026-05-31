@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body { background: #f0f2f5; text-align: center; font-family: Arial, sans-serif; padding-top: 80px; }
+        .login-card { background: white; width: 85%; margin: auto; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 2px solid #000; }
+        h2 { margin-bottom: 20px; font-size: 24px; }
+        input { width: 90%; padding: 15px; margin: 10px 0; border: 2px solid #333; border-radius: 8px; font-size: 18px; font-weight: bold; }
+        button { width: 95%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:active { background: #0056b3; }
+        p { margin-top: 15px; font-weight: bold; }
+        a { color: #007bff; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2>লগইন করুন 🫵😐</h2>
+        <input type="number" id="l-num" placeholder="ফোন নাম্বার">
+        <input type="password" id="l-pass" placeholder="পাসওয়ার্ড">
+        <button id="loginBtn">লগইন নিশ্চিত করুন</button>
+        <p>অ্যাকাউন্ট নেই? <a href="register.html">রেজিস্ট্রেশন করুন</a></p>
+    </div>
+
+    <script type="module">
+        // Firebase মডিউল ইমপোর্ট করা
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        // আপনার Firebase কনফিগারেশন (স্ক্রিনশট অনুযায়ী মিলানো হয়েছে)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWxpvsh9lAzeRNhqwoLZeRNhqwoLZ", 
+            authDomain: "city-loan-24.firebaseapp.com",
+            projectId: "city-loan-24",
+            storageBucket: "city-loan-24.appspot.com",
+            messagingSenderId: "89116730523",
+            appId: "1:89116730523:web:bd77d11900fbd77d11900f"
+        };
+
+        // Firebase ইনিশিয়ালাইজ করা
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // লগইন ফাংশন
+        document.getElementById('loginBtn').onclick = async () => {
+            const num = document.getElementById('l-num').value;
+            const pass = document.getElementById('l-pass').value;
+
+            if(!num || !pass) {
+                alert("সবগুলো ঘর পূরণ করুন 🙄");
+                return;
+            }
+
+            try {
+                // ডাটাবেস থেকে ইউজার চেক করা
+                const userRef = doc(db, "users", num);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    // পাসওয়ার্ড চেক করা
+                    if(userSnap.data().uPass === pass) {
+                        localStorage.setItem("userNum", num); // ভবিষ্যতে ব্যবহারের জন্য নাম্বার সেভ রাখা
+                        alert("লগইন সফল! ✅");
+                        window.location.href = "home.html"; // হোম পেজে নিয়ে যাবে
+                    } else {
+                        alert("ভুল পাসওয়ার্ড! ❌");
+                    }
+                } else {
+                    alert("এই নাম্বার দিয়ে কোনো অ্যাকাউন্ট নেই! আগে রেজিস্ট্রেশন করুন।");
+                    window.location.href = "register.html";
+                }
+            } catch (e) {
+                alert("সমস্যা হয়েছে: " + e.message);
+            }
+        };
+    </script>
+</body>
+</html>

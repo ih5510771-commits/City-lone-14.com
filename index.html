@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <style>
+        body { background: #f0f2f5; text-align: center; font-family: Arial, sans-serif; padding-top: 50px; }
+        .container { background: white; width: 85%; margin: auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input { width: 90%; padding: 15px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
+        button { width: 95%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>নতুন অ্যাকাউন্ট</h2>
+        <input type="text" id="name" placeholder="আপনার নাম">
+        <input type="number" id="num" placeholder="ফোন নাম্বার">
+        <input type="password" id="pass" placeholder="পাসওয়ার্ড">
+        <button id="regBtn">রেজিস্ট্রেশন করুন</button>
+        <p>অ্যাকাউন্ট আছে? <a href="login.html">লগইন করুন</a></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        // আপনার Firebase কনফিগারেশন
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWxpvsh9lAzeRNhqwoLZeRNhqwoLZ", 
+            authDomain: "city-loan-24.firebaseapp.com",
+            projectId: "city-loan-24",
+            appId: "1:89116730523:web:bd77d11900fbd77d11900f"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // লিংক থেকে অটোমেটিক রেফার কোড/নম্বর খুঁজে নেওয়ার লজিক
+        const urlParams = new URLSearchParams(window.location.search);
+        const referCode = urlParams.get('ref') || ""; 
+
+        document.getElementById('regBtn').onclick = async () => {
+            const uName = document.getElementById('name').value;
+            const uNum = document.getElementById('num').value;
+            const uPass = document.getElementById('pass').value;
+
+            if(!uName || !uNum || !uPass) return alert("সব তথ্য দিন!");
+
+            try {
+                // ডাটাবেসে ইউজার সেভ করা (রেফার নম্বরসহ)
+                await setDoc(doc(db, "users", uNum), {
+                    uName: uName,
+                    uNum: uNum,
+                    uPass: uPass,
+                    balance: 0,
+                    uRole: "user",
+                    referredBy: referCode // রেফার কোড থাকলে জমা হবে, না থাকলে খালি থাকবে
+                });
+                alert("রেজিস্ট্রেশন সফল!");
+                window.location.href = "login.html";
+            } catch (e) { alert("Error: " + e.message); }
+        };
+    </script>
+</body>
+</html>

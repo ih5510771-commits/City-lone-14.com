@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - City Loan 24</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        body { background-color: #f1f5f9; padding: 20px; color: #333; }
+        
+        /* এডমিন হেডার */
+        .admin-header { background: #d32f2f; color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .admin-header h1 { font-size: 26px; margin-bottom: 5px; }
+        .admin-header p { font-size: 16px; opacity: 0.9; }
+
+        /* সেকশন কন্টেইনার */
+        .admin-section { background: white; padding: 20px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .section-title { font-size: 18px; font-weight: bold; color: #d32f2f; margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
+
+        /* বাজেট ডিসপ্লে কার্ড */
+        .budget-card { background: #fff0f0; border: 1px solid #ffcccc; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
+        .budget-card h3 { font-size: 22px; color: #d32f2f; }
+
+        /* টেবিল ডিজাইন */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 15px; }
+        th { background: #f8fafc; color: #475569; font-weight: bold; }
+        
+        /* বাটন স্টাইল */
+        .admin-btn { padding: 6px 12px; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; color: white; }
+        .block-btn { background: #dc2626; }
+        .unblock-btn { background: #16a34a; }
+        .approve-btn { background: #2563eb; }
+        .submit-btn { width: 100%; padding: 14px; background: #d32f2f; font-size: 16px; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .budget-btn { background: #475569; padding: 10px 15px; border: none; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; margin-top: 5px; }
+
+        /* ইনপুট ফর্ম */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 15px; font-weight: bold; margin-bottom: 5px; color: #475569; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; outline: none; font-weight: bold; }
+        
+        .flex-inputs { display: flex; gap: 10px; align-items: flex-end; }
+        .flex-inputs .form-group { flex: 1; margin-bottom: 0; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-header">
+        <h1>সিটি লোন ২৪ - এডমিন প্যানেল</h1>
+        <p>নিয়ন্ত্রণ ও ব্যবস্থাপনা কেন্দ্র</p>
+    </div>
+
+    <div class="admin-section">
+        <div class="section-title">💼 এডমিন বাজেট কন্ট্রোল (ডেমো)</div>
+        <div class="budget-card">
+            <h3>বর্তমান বাজেট: ৳ <span id="displayBudget">0.00</span></h3>
+        </div>
+        <div class="flex-inputs">
+            <div class="form-group">
+                <label>নতুন বাজেট সেট করুন</label>
+                <input type="number" id="inputNewBudget" placeholder="বাজেটের পরিমাণ লিখুন">
+            </div>
+            <button class="budget-btn" id="btnUpdateBudget">বাজেট আপডেট করুন</button>
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <div class="section-title">🚫 নাম্বার দিয়ে সরাসরি ইউজার ব্লক করুন</div>
+        <div class="form-group">
+            <label>ইউজারের মোবাইল নম্বর</label>
+            <input type="text" id="blockUserNum" placeholder="01XXXXXXXXX">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="submit-btn style-block" id="btnDirectBlock" style="background: #dc2626;">অ্যাকাউন্ট ব্লক করুন</button>
+            <button class="submit-btn style-unblock" id="btnDirectUnblock" style="background: #16a34a;">অ্যাকাউন্ট আনব্লক করুন</button>
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <div class="section-title">👤 নিবন্ধিত ইউজার রেকর্ড ও তালিকা</div>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>নাম</th>
+                        <th>মোবাইল নম্বর</th>
+                        <th>বর্তমান ব্যালেন্স</th>
+                        <th>অবস্থা (Status)</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <div class="section-title">💸 ইউজার উইথড্র (ক্যাশ আউট) রিকোয়েস্ট সমূহ</div>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ইউজার নম্বর</th>
+                        <th>বিকাশ নম্বর</th>
+                        <th>পরিমাণ (৳)</th>
+                        <th>অবস্থা</th>
+                        <th>অ্যাকশন</th>
+                    </tr>
+                </thead>
+                <tbody id="withdrawTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <div class="section-title">📲 ইউজার টপ আপ / ব্যালেন্স লোড (বাজেট থেকে কর্তন)</div>
+        <div class="form-group">
+            <label>ইউজারের মোবাইল নম্বর</label>
+            <input type="text" id="topupUserNum" placeholder="01XXXXXXXXX">
+        </div>
+        <div class="form-group">
+            <label>টাকার পরিমাণ (৳)</label>
+            <input type="number" id="topupAmount" placeholder="পরিমাণ লিখুন">
+        </div>
+        <button class="submit-btn" id="btnSubmitTopup">ইউজার একাউন্টে ব্যালেন্স লোড দিন</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, doc, onSnapshot, updateDoc, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWxpvsh9lAzeRNhqwoLZeRNhqwoLZ", 
+            authDomain: "city-loan-24.firebaseapp.com",
+            projectId: "city-loan-24",
+            appId: "1:89116730523:web:bd77d11900fbd77d11900f"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ডেমো বাজেট লোড এবং হ্যান্ডেল করার লজিক
+        let currentAdminBudget = 0;
+        function listenToBudget() {
+            onSnapshot(doc(db, "admin_settings", "budget_info"), (budgetSnap) => {
+                if(budgetSnap.exists()) {
+                    currentAdminBudget = budgetSnap.data().amount || 0;
+                } else {
+                    currentAdminBudget = 0;
+                }
+                document.getElementById('displayBudget').innerText = Number(currentAdminBudget).toFixed(2);
+                
+                // ইউজার অ্যাপের refer_budget ফাইলটিকে এই মূল ডক ফাইলের সাথে সিঙ্ক বা ব্যাকআপ এলাইনমেন্টে রাখা হলো
+                setDoc(doc(db, "admin_budget", "refer_budget"), { totalAmount: currentAdminBudget }, { merge: true });
+            });
+        }
+        listenToBudget();
+
+        // বাজেট আপডেট বা পুনরায় লিখে রাখার বাটন ক্লিক
+        document.getElementById('btnUpdateBudget').onclick = async () => {
+            const newBudgetVal = Number(document.getElementById('inputNewBudget').value);
+            if(!newBudgetVal || newBudgetVal < 0) {
+                alert("দয়া করে সঠিক বাজেটের সংখ্যা লিখুন!");
+                return;
+            }
+            await setDoc(doc(db, "admin_settings", "budget_info"), { amount: newBudgetVal }, { merge: true });
+            alert("আপনার ডেমো বাজেট সফলভাবে আপডেট করা হয়েছে!");
+            document.getElementById('inputNewBudget').value = "";
+        };
+
+        // মোবাইল নাম্বার লিখে সরাসরি ব্লক মারার সিস্টেম লজিক
+        document.getElementById('btnDirectBlock').onclick = async () => {
+            const targetMobile = document.getElementById('blockUserNum').value.trim();
+            if(!targetMobile) { alert("মোবাইল নম্বরটি লিখুন!"); return; }
+            
+            const userRef = doc(db, "users", targetMobile);
+            const userSnap = await getDoc(userRef);
+            
+            if(userSnap.exists()) {
+                await updateDoc(userRef, { isBlocked: true });
+                alert(`সফলভাবে ${targetMobile} নম্বরটি ব্লক করা হয়েছে! সে আর অ্যাপে ঢুকতে পারবে না।`);
+                document.getElementById('blockUserNum').value = "";
+            } else {
+                alert("এই নম্বরে কোনো ইউজার অ্যাকাউন্ট খুঁজে পাওয়া যায়নি!");
+            }
+        };
+
+        // মোবাইল নাম্বার লিখে সরাসরি আনব্লক করার সিস্টেম লজিক
+        document.getElementById('btnDirectUnblock').onclick = async () => {
+            const targetMobile = document.getElementById('blockUserNum').value.trim();
+            if(!targetMobile) { alert("মোবাইল নম্বরটি লিখুন!"); return; }
+            
+            const userRef = doc(db, "users", targetMobile);
+            const userSnap = await getDoc(userRef);
+            
+            if(userSnap.exists()) {
+                await updateDoc(userRef, { isBlocked: false });
+                alert(`সফলভাবে ${targetMobile} নম্বরটি আনব্লক করা হয়েছে।`);
+                document.getElementById('blockUserNum').value = "";
+            } else {
+                alert("এই নম্বরে কোনো ইউজার অ্যাকাউন্ট খুঁজে পাওয়া যায়নি!");
+            }
+        };
+
+        // ১. ইউজার রেকর্ড তালিকা রিয়েল-টাইম রিড করা
+        function listenToAllUsers() {
+            onSnapshot(collection(db, "users"), (snapshot) => {
+                const tbody = document.getElementById('userTableBody');
+                tbody.innerHTML = "";
+                
+                snapshot.forEach((userDoc) => {
+                    const uData = userDoc.data();
+                    const uNum = userDoc.id;
+                    const isBlocked = uData.isBlocked || false;
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${uData.uName || 'N/A'}</td>
+                        <td>${uNum}</td>
+                        <td>৳ ${Number(uData.balance || 0).toFixed(2)}</td>
+                        <td style="color: ${isBlocked ? 'red' : 'green'}; font-weight: bold;">
+                            ${isBlocked ? 'ব্লকড ❌' : 'সক্রিয় ✅'}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+
+        // ৩. উইথড্র রিকোয়েস্ট রিয়েল-টাইম দেখা এবং অনুমোদন করার লজিক
+        function listenToWithdrawRequests() {
+            onSnapshot(collection(db, "withdraws"), (snapshot) => {
+                const tbody = document.getElementById('withdrawTableBody');
+                tbody.innerHTML = "";
+
+                snapshot.forEach((wDoc) => {
+                    const wData = wDoc.data();
+                    const wId = wDoc.id;
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${wData.userNum}</td>
+                        <td>${wData.bkashNum || 'N/A'}</td>
+                        <td>৳ ${wData.amount}</td>
+                        <td style="font-weight: bold; color: ${wData.status === 'success' ? 'green' : 'orange'};">
+                            ${wData.status === 'success' ? 'উইথড্র সফল' : 'পেন্ডিং'}
+                        </td>
+                        <td>
+                            ${wData.status !== 'success' ? `<button class="admin-btn approve-btn" onclick="approveWithdraw('${wId}')">অনুমোদন করুন</button>` : 'সম্পন্ন'}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+
+        // উইথড্র অনুমোদন (সফল) করার অ্যাকশন
+        window.approveWithdraw = async function(reqId) {
+            const confirmApprove = confirm("আপনি কি উইথড্র রিকোয়েস্টটি সফল করতে চান? (বিকাশ থেকে টাকা ম্যানুয়ালি দেওয়ার পর এটি সিলেক্ট করুন)");
+            if (confirmApprove) {
+                await updateDoc(doc(db, "withdraws", reqId), {
+                    status: "success"
+                });
+                alert("উইথড্র সফলভাবে অনুমোদন করা হয়েছে। ইউজারের স্ক্রিনে 'উইথড্র সফল' দেখাবে।");
+            }
+        };
+
+        // ৪. বাজেট কেটে ইউজার অ্যাকাউন্টে টপ আপ/ব্যালেন্স লোড দেওয়া
+        document.getElementById('btnSubmitTopup').onclick = async () => {
+            const targetNum = document.getElementById('topupUserNum').value.trim();
+            const amountToAdd = Number(document.getElementById('topupAmount').value);
+
+            if (!targetNum || !amountToAdd || amountToAdd <= 0) {
+                alert("অনুগ্রহ করে সঠিক মোবাইল নম্বর এবং টাকার পরিমাণ লিখুন!");
+                return;
+            }
+
+            if(amountToAdd > currentAdminBudget) {
+                alert("দুঃখিত! আপনার এডমিন বাজেটে পর্যাপ্ত টাকা নেই। বাজেট আবার লিখে লোড দিন।");
+                return;
+            }
+
+            try {
+                // ইউজারের একাউন্টে ব্যালেন্স বাড়িয়ে দেওয়া
+                await updateDoc(doc(db, "users", targetNum), {
+                    balance: increment(amountToAdd)
+                });
+
+                // এডমিন ডেমো বাজেট থেকে টাকা কেটে নেওয়া
+                await updateDoc(doc(db, "admin_settings", "budget_info"), {
+                    amount: increment(-amountToAdd)
+                });
+
+                alert(`সফলভাবে বাজেট থেকে কেটে ${targetNum} নম্বরে ৳${amountToAdd} ব্যালেন্স লোড দেওয়া হয়েছে।`);
+                document.getElementById('topupUserNum').value = "";
+                document.getElementById('topupAmount').value = "";
+            } catch (error) {
+                alert("ত্রুটি! এই নম্বরে কোনো নিবন্ধিত ইউজার পাওয়া যায়নি।");
+            }
+        };
+
+        // লোন জামানত এর টাকা অটোমেটিক ট্র্যাক করে বাজেট কাটার ব্যাকএন্ড ওয়াচার সিস্টেম
+        function listenToInstantTransactionsForBudgetDeduction() {
+            onSnapshot(collection(db, "transactions"), (snapshot) => {
+                snapshot.docChanges().forEach(async (change) => {
+                    if (change.type === "added") {
+                        const txData = change.doc.data();
+                        // ইউজার লোন সাবমিট করলে যদি তার জামানতের ডাটা তৈরি হয়
+                        if (txData.type === "loan_instant_success" && txData.securityAmountPaid > 0) {
+                            const alreadyCheckedDocRef = doc(db, "admin_processed_loans", change.doc.id);
+                            const checkSnap = await getDoc(alreadyCheckedDocRef);
+                            
+                            // ডুপ্লিকেট কাটা রোধ করতে ভেরিফিকেশন চেক
+                            if (!checkSnap.exists()) {
+                                const securityAmount = Number(txData.securityAmountPaid);
+                                
+                                // এডমিন প্যানেলের বাজেট ডক থেকে জামানতের সমপরিমাণ টাকা অটো কেটে সাবট্র্যাক্ট করা হবে
+                                await updateDoc(doc(db, "admin_settings", "budget_info"), {
+                                    amount: increment(-securityAmount)
+                                });
+                                
+                                // চেকড ফ্ল্যাগ রেজিস্ট্রি মার্ক করা
+                                await setDoc(alreadyCheckedDocRef, { processed: true, timestamp: new Date().toISOString() });
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        // লাইভ ডাটা লিসেনারসমূহ চালু করা
+        onMounted();
+        function onMounted(){
+            listenToAllUsers();
+            listenToWithdrawRequests();
+            listenToInstantTransactionsForBudgetDeduction();
+        }
+    </script>
+</body>
+</html>
